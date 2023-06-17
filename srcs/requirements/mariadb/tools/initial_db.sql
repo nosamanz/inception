@@ -1,5 +1,5 @@
 CREATE DATABASE IF NOT EXISTS wordpress;
 CREATE USER IF NOT EXISTS 'oozcan'@'%' IDENTIFIED BY 'pass123';
-GRANT ALL PRIVILAGES ON wordpress.* TO 'oozcan'@'%';
-FLUSH PRIVILAGES;
-ALTER USER 'root'@'localhost' IDENTIFIED BY 'root123';
+GRANT ALL PRIVILEGES ON wordpress.* TO 'oozcan'@'%';
+FLUSH PRIVILEGES;
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'passroot123';

@@ -1,9 +1,10 @@
-DOCKER = docker-compose -f ./srcs/docker-compose.yml
+DOCKER := docker-compose -f ./srcs/docker-compose.yml
+USER_HOME = $(HOME)
 
 all:
-	sudo mkdir -p /home/data/wordpress
-	sudo mkdir -p /home/data/mysql
-	$(DOCKER) up -d build
+	sudo mkdir -p $(USER_HOME)/data/wordpress
+	sudo mkdir -p $(USER_HOME)/data/mysql
+	export USER_HOME=$$HOME && $(DOCKER) up -d --build
 
 down:
 	$(DOCKER) down
@@ -11,9 +12,10 @@ down:
 re: clean all
 
 clean:
-# Down ile durdurur ve vagli volumleri kaldirir
 	$(DOCKER) down -v --remove-orphans
-#Kullanilmayan imajlari siler
 	@docker rmi -f $$(docker images -q)
+	sudo rm -rf $(USER_HOME)/data/*
+
+fclean: clean
 
 .PHONY: all down re clean

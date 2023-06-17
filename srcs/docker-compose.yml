@@ -1,50 +1,71 @@
-#docker-compose version
 version: '3'
 
 services:
+  nginx:
+      container_name: nginx
+      build: ./requirements/nginx
+      ports:
+        - 443:443
+      volumes:
+        - wordpress_data:/var/www/html
+      restart: always
+      networks:
+        - network
 
-		nginx:
+  mariadb:
+    container_name: mariadb
+    build: ./requirements/mariadb
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      - network
+    restart: always
+    env_file:
+      - .env
 
-			conteiner_name: nginx
-
-			build: ./requirements/nginx
-
-			ports:
-				- 443:443
-
-			volumes:
-				- wordpress_data:/var/www/html
-
-			restart: always
-
-			networks:
-				- network
-
-		mariadb:
-			conteiner_name: mariadb
-			build: ./requirements/mariadb
-			volumes:
-				- mariadb_data:/var/lib/mysql
-			networks:
-				- network
-			restart: always
-			env_file:
-				- .env
+  wordpress:
+    container_name: wordpress
+    depends_on:
+      - mariadb
+    build: ./requirements/wordpress
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - wordpress_data:/var/www/html
+    networks:
+      - network
+#Bonus
+  adminer:
+    build: ./requirements/bonus/adminer
+    restart: always
+    depends_on:
+      - mariadb
+    expose:
+     - "9000"
+    networks:
+      - network
 
 volumes:
-	mariadb_data:
-		driver: local
-		driver_opts:
-			type: none
-			device: /home/data/mysql
-			o: bind
-	wordpress_data:
-		driver: local
-		driver_opts:
-			type: none
-			device: /home/data/wordpress
-			o: bind
+  mariadb_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${USER_HOME}/data/mysql
+      o: bind
+  wordpress_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${USER_HOME}/data/wordpress
+      o: bind
+  # wordpress_data:
+  #   driver: local
+  #   driver_opts:
+  #     type: nfs
+  #     device: server:/path/to/nfs/share
+  #     o: addr=192.168.1.100,rw
 
 networks:
-	network:
-		driver: bridge
+  network:
+    driver: bridge
